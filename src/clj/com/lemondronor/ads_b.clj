@@ -1,9 +1,11 @@
 (ns com.lemondronor.ads-b
   "Decodes Mode-S messages."
   (:import (org.opensky.libadsb Decoder tools)
+           (org.opensky.libadsb.exceptions MissingInformationException)
            (org.opensky.libadsb.msgs
             AirbornePositionMsg AirspeedHeadingMsg EmergencyOrPriorityStatusMsg
-            IdentificationMsg SurfacePositionMsg VelocityOverGroundMsg)))
+            IdentificationMsg OperationalStatusMsg SurfacePositionMsg
+            VelocityOverGroundMsg)))
 
 (set! *warn-on-reflection* true)
 
@@ -20,6 +22,21 @@
 (defmacro assoc-when [test m & args]
   `(let [m# ~m]
      (if ~test (assoc m# ~@args) m#)))
+
+
+
+
+(defn assoc-when-exists% [m k v-fn]
+  (try
+    (assoc m k (v-fn))
+    (catch MissingInformationException e
+      m)))
+
+
+(defmacro assoc-when-exists [m & args]
+  `(-> ~m
+       ~@(for [[k v] (partition 2 args)]
+           `(assoc-when-exists% ~k (fn [] ~v)))))
 
 
 (extend-type AirbornePositionMsg
@@ -106,6 +123,42 @@
      :emitter-category (.getEmitterCategory msg)
      :category-description (.getCategoryDescription msg)
      :callsign (String. (.getIdentity msg))}))
+
+
+(extend-type OperationalStatusMsg
+  IDictable
+  (as-dict [msg]
+    (-> {:icao (tools/toHexString (.getIcao24 msg))
+         :downlink-format (.getDownlinkFormat msg)
+         :capabilities (.getCapabilities msg)
+         :format-type-code (.getFormatTypeCode msg)
+         :version (.getVersion msg)
+         :nic-supplement-a (.getNICSupplementA msg)
+         :position-nac (.getPositionNAC msg)
+         :geometric-vert-accuracy (.getGeometricVerticalAccuracy msg)
+         :source-integrity-level (.getSourceIntegrityLevel msg)}
+        (assoc-when-exists
+         :has-tcas? (.hasOperationalTCAS msg)
+         :has-1090es-in? (.has1090ESIn msg)
+         :supports-air-referenced-vel? (.supportsAirReferencedVelocity msg)
+         :has-low-tx-power? (.hasLowTxPower msg)
+         :supports-target-state-report? (.supportsTargetStateReport msg)
+         :supports-target-change-report? (.supportsTargetChangeReport msg)
+         :has-uat-in? (.hasUATIn msg)
+         :nac-v (.getNACV msg)
+         :nic-supplement-c (.getNICSupplementC msg)
+         :has-tcas-ra? (.hasTCASResolutionAdvisory msg)
+         :has-active-ident-switch? (.hasActiveIDENTSwitch msg)
+         :uses-single-antenna? (.usesSingleAntenna msg)
+         :system-design-assurance? (.getSystemDesignAssurance msg)
+         :gps-antenna-offset (.getGPSAntennaOffset msg)
+         :airplane-length (.getAirplaneLength msg)
+         :airplane-width (.getAirplaneWidth msg)
+         :barometric-alt-integrity-code (.getBarometricAltitudeIntegrityCode msg)
+         :track-heading-info (.getTrackHeadingInfo msg)
+         :horizontal-reference-dir (if (.getHorizontalReferenceDirection msg)
+                                     :magnetic-north
+                                     :true-north)))))
 
 
 (extend-type SurfacePositionMsg

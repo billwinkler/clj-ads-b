@@ -50,6 +50,18 @@
            (ads-b/decode-hex "903c1ff810820820820820000000")))))
 
 
+(deftest decode-operational-status-test
+  (testing "Operational status"
+    (is (= {:icao "3c1ff8",
+            :downlink-format 18,
+            :capabilities 4,
+            :format-type-code 2,
+            :emitter-category 0,
+            :callsign "        "
+            :category-description "No ADS-B Emitter Category Information"}
+           (ads-b/decode-hex "8d3cbdcef8230002004ab8000000")))))
+
+
 (deftest decode-surface-position-test
   (testing "Surface position"
     (is (= {:horizontal-containment-radius-limit 25.0,

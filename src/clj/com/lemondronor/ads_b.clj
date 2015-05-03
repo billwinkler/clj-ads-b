@@ -96,37 +96,6 @@
      :mode-a-code (vec (.getModeACode msg))}))
 
 
-(extend-type VelocityOverGroundMsg
-  IDictable
-  (as-dict [msg]
-    (letfn [(add-vel [d]
-              (assoc-when (.hasVelocityInfo msg)
-                d
-                :heading (.getHeading msg)
-                :ground-speed (.getVelocity msg)
-                :e-w-spd (.getEastToWestVelocity msg)
-                :n-s-spd (.getNorthToSouthVelocity msg)))
-            (add-vert-spd [d]
-              (assoc-when (.hasVerticalRateInfo msg)
-                d :vertical-spd (.getVerticalRate msg)))
-            (add-geo-minus-baro [d]
-              (assoc-when (.hasGeoMinusBaroInfo msg)
-                d :geo-minus-baro (.getGeoMinusBaro msg)))]
-      (->
-       {:icao (tools/toHexString (.getIcao24 msg))
-        :downlink-format (.getDownlinkFormat msg)
-        :capabilities (.getCapabilities msg)
-        :format-type-code (.getFormatTypeCode msg)
-        :supersonic? (.isSupersonic msg)
-        :change-intent? (.hasChangeIntent msg)
-        :ifr? (.hasIFRCapability msg)
-        :nac (.getNavigationAccuracyCategory msg)
-        :barometric-vertical-spd? (.isBarometricVerticalSpeed msg)}
-       add-vel
-       add-vert-spd
-       add-geo-minus-baro))))
-
-
 (extend-type IdentificationMsg
   IDictable
   (as-dict [msg]
@@ -167,6 +136,37 @@
         :time-flag (.isTime_flag msg)
         :baro-alt? (.isBarometricAltitude msg)}
        add-gnd-spd))))
+
+
+(extend-type VelocityOverGroundMsg
+  IDictable
+  (as-dict [msg]
+    (letfn [(add-vel [d]
+              (assoc-when (.hasVelocityInfo msg)
+                d
+                :heading (.getHeading msg)
+                :ground-speed (.getVelocity msg)
+                :e-w-spd (.getEastToWestVelocity msg)
+                :n-s-spd (.getNorthToSouthVelocity msg)))
+            (add-vert-spd [d]
+              (assoc-when (.hasVerticalRateInfo msg)
+                d :vertical-spd (.getVerticalRate msg)))
+            (add-geo-minus-baro [d]
+              (assoc-when (.hasGeoMinusBaroInfo msg)
+                d :geo-minus-baro (.getGeoMinusBaro msg)))]
+      (->
+       {:icao (tools/toHexString (.getIcao24 msg))
+        :downlink-format (.getDownlinkFormat msg)
+        :capabilities (.getCapabilities msg)
+        :format-type-code (.getFormatTypeCode msg)
+        :supersonic? (.isSupersonic msg)
+        :change-intent? (.hasChangeIntent msg)
+        :ifr? (.hasIFRCapability msg)
+        :nac (.getNavigationAccuracyCategory msg)
+        :barometric-vertical-spd? (.isBarometricVerticalSpeed msg)}
+       add-vel
+       add-vert-spd
+       add-geo-minus-baro))))
 
 
 (defn decode-hex

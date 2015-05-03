@@ -25,6 +25,47 @@
          (ads-b/decode-hex "8dc0ffee58b986d0b3bd25000000")))))
 
 
+(deftest decode-emergency-or-priority-test
+  (testing "Emergency or Priority"
+    (is (= {:icao "3cbdce",
+            :downlink-format 17,
+            :capabilities 4,
+            :format-type-code 28
+            :subtype 1
+            :emergency-state-code 0
+            :emergency-state-text "no emergency"
+            :mode-a-code [7 0 7 3]}
+           (ads-b/decode-hex "8d3cbdcee1199400000000000000")))))
+
+
+(deftest decode-identification-test
+  (testing "Identification"
+    (is (= {:icao "3c1ff8",
+            :downlink-format 18,
+            :capabilities 4,
+            :format-type-code 2,
+            :emitter-category 0,
+            :callsign "        "
+            :category-description "No ADS-B Emitter Category Information"}
+           (ads-b/decode-hex "903c1ff810820820820820000000")))))
+
+
+(deftest decode-surface-position-test
+  (testing "Surface position"
+    (is (= {:horizontal-containment-radius-limit 25.0,
+            :capabilities 4,
+            :icao "3c432e",
+            :time-flag false,
+            :baro-alt? true,
+            :ground-speed-resolution 0.257222,
+            :nic-supplement 0,
+            :nic 10,
+            :format-type-code 6,
+            :ground-speed 4.372774,
+            :downlink-format 18}
+           (ads-b/decode-hex "903c432e31aad1686b3806000000")))))
+
+
 (deftest decode-velocity-over-ground-test
   (testing "Decoding velocity over ground"
     (is (= {:capabilities 0,
@@ -43,44 +84,3 @@
             :downlink-format 17,
             :heading 61.77122381863042}
            (ads-b/decode-hex "8d48cb1599117d19a00499000000")))))
-
-
-(deftest decode-identification-test
-  (testing "Identification"
-    (is (= {:icao "3c1ff8",
-            :downlink-format 18,
-            :capabilities 4,
-            :format-type-code 2,
-            :emitter-category 0,
-            :callsign "        "
-            :category-description "No ADS-B Emitter Category Information"}
-           (ads-b/decode-hex "903c1ff810820820820820000000")))))
-
-
-(deftest decode-emergency-or-priority-test
-  (testing "Emergency or Priority"
-    (is (= {:icao "3cbdce",
-            :downlink-format 17,
-            :capabilities 4,
-            :format-type-code 28
-            :subtype 1
-            :emergency-state-code 0
-            :emergency-state-text "no emergency"
-            :mode-a-code [7 0 7 3]}
-           (ads-b/decode-hex "8d3cbdcee1199400000000000000")))))
-
-
-(deftest decode-surface-position-test
-  (testing "Surface position"
-    (is (= {:horizontal-containment-radius-limit 25.0,
-            :capabilities 4,
-            :icao "3c432e",
-            :time-flag false,
-            :baro-alt? true,
-            :ground-speed-resolution 0.257222,
-            :nic-supplement 0,
-            :nic 10,
-            :format-type-code 6,
-            :ground-speed 4.372774,
-            :downlink-format 18}
-           (ads-b/decode-hex "903c432e31aad1686b3806000000")))))

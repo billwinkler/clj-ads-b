@@ -1,9 +1,9 @@
-
 (defproject com.lemondronor/ads-b "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :description "Clojure code for parsing ADS-B transponder messages."
+  :url "https://github.com/wiseman/clj-ads-b"
+  :license {:name "GNU General Public License Version 3"
+            :url "http://www.gnu.org/copyleft/gpl.html"}
+  :deploy-repositories [["releases" :clojars]]
   :source-paths ["src/clj"]
   :java-source-paths ["src/java"]
   :dependencies [[org.apache.avro/avro "1.7.6"]

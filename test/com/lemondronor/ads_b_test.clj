@@ -6,7 +6,8 @@
 
 (deftest decode-airborne-position-test
   (testing "Decoding airborne position"
-    (is (= {:horizontal-containment-radius-limit 185.2,
+    (is (= {:type :airborne-position
+            :horizontal-containment-radius-limit 185.2,
             :capabilities 0,
             :nic-supplement-b false,
             :surveillance-status 0,
@@ -27,7 +28,8 @@
 
 (deftest decode-emergency-or-priority-test
   (testing "Emergency or Priority"
-    (is (= {:icao "3cbdce",
+    (is (= {:type :extended-squitter-aircraft-status
+            :icao "3cbdce",
             :downlink-format 17,
             :capabilities 4,
             :format-type-code 28
@@ -40,7 +42,8 @@
 
 (deftest decode-identification-test
   (testing "Identification"
-    (is (= {:icao "3c1ff8",
+    (is (= {:type :identification
+            :icao "3c1ff8",
             :downlink-format 18,
             :capabilities 4,
             :format-type-code 2,
@@ -52,19 +55,35 @@
 
 (deftest decode-operational-status-test
   (testing "Operational status"
-    (is (= {:icao "3c1ff8",
-            :downlink-format 18,
+    (is (= {:position-nac 10.0,
             :capabilities 4,
-            :format-type-code 2,
-            :emitter-category 0,
-            :callsign "        "
-            :category-description "No ADS-B Emitter Category Information"}
+            :system-design-assurance? 2,
+            :barometric-alt-integrity-code true,
+            :supports-target-change-report? false,
+            :icao "3cbdce",
+            :supports-air-referenced-vel? true,
+            :nic-supplement-a false,
+            :has-active-ident-switch? false,
+            :type :aircraft-operational-status,
+            :horizontal-reference-dir :true-north,
+            :has-tcas-ra? false,
+            :uses-single-antenna? false,
+            :format-type-code 31,
+            :source-integrity-level 3,
+            :geometric-vert-accuracy -1,
+            :has-uat-in? false,
+            :supports-target-state-report? true,
+            :version 2,
+            :has-1090es-in? false,
+            :has-tcas? true,
+            :downlink-format 17}
            (ads-b/decode-hex "8d3cbdcef8230002004ab8000000")))))
 
 
 (deftest decode-surface-position-test
   (testing "Surface position"
-    (is (= {:horizontal-containment-radius-limit 25.0,
+    (is (= {:type :surface-position
+            :horizontal-containment-radius-limit 25.0,
             :capabilities 4,
             :icao "3c432e",
             :time-flag false,
@@ -80,7 +99,8 @@
 
 (deftest decode-velocity-over-ground-test
   (testing "Decoding velocity over ground"
-    (is (= {:capabilities 0,
+    (is (= {:type :airborne-velocity
+            :capabilities 0,
             :e-w-spd -195.48872,
             :n-s-spd -104.94657600000001,
             :vertical-spd 0.0,

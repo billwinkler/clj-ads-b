@@ -1,9 +1,9 @@
 (ns com.lemondronor.ads-b
   "Decodes Mode-S messages."
   (:import (org.opensky.libadsb Decoder tools)
-           (org.opensky.libadsb.msgs AirbornePositionMsg AirspeedHeadingMsg
-                                     IdentificationMsg SurfacePositionMsg
-                                     VelocityOverGroundMsg)))
+           (org.opensky.libadsb.msgs
+            AirbornePositionMsg AirspeedHeadingMsg EmergencyOrPriorityStatusMsg
+            IdentificationMsg SurfacePositionMsg VelocityOverGroundMsg)))
 
 (set! *warn-on-reflection* true)
 
@@ -28,7 +28,7 @@
     (letfn [(add-alt [d]
               (assoc-when (.hasAltitude msg)
                 d
-                :is-baro-alt (.isBarometricAltitude msg)
+                :baro-alt? (.isBarometricAltitude msg)
                 :alt (.getAltitude msg)))
             (add-pos [d]
               (assoc-when (.hasPosition msg)
@@ -83,6 +83,19 @@
        add-geo-minus-baro))))
 
 
+(extend-type EmergencyOrPriorityStatusMsg
+  IDictable
+  (as-dict [msg]
+    {:icao (tools/toHexString (.getIcao24 msg))
+     :downlink-format (.getDownlinkFormat msg)
+     :capabilities (.getCapabilities msg)
+     :format-type-code (.getFormatTypeCode msg)
+     :subtype (.getSubtype msg)
+     :emergency-state-code (.getEmergencyStateCode msg)
+     :emergency-state-text (.getEmergencyStateText msg)
+     :mode-a-code (vec (.getModeACode msg))}))
+
+
 (extend-type VelocityOverGroundMsg
   IDictable
   (as-dict [msg]
@@ -131,10 +144,18 @@
   (as-dict [msg]
     (letfn [(add-pos [d]
               (assoc-when (.hasPosition msg)
-                d :heading (.getHeading msg)))
+                d
+                :cpr-lat (.getCPREncodedLatitude msg)
+                :cpr-lon (.getCPREncodedLongitude msg)
+                :cpr-format (if (.isOddFormat msg) :odd :even)))
+            (add-hdg [d]
+              (assoc-when (.hasValidHeading msg)
+                          d (:heading (.getHeading msg))))
             (add-gnd-spd [d]
               (assoc-when (.hasGroundSpeed msg)
-                d :1))]
+                d
+                :ground-speed (.getGroundSpeed msg)
+                :ground-speed-resolution (.getGroundSpeedResolution msg)))]
       (->
        {:icao (tools/toHexString (.getIcao24 msg))
         :downlink-format (.getDownlinkFormat msg)
@@ -142,7 +163,10 @@
         :format-type-code (.getFormatTypeCode msg)
         :nic-supplement (.getNICSupplement msg)
         :horizontal-containment-radius-limit (.getHorizontalContainmentRadiusLimit msg)
-        :nic (.getNavigationIntegrityCategory msg)}))))
+        :nic (.getNavigationIntegrityCategory msg)
+        :time-flag (.isTime_flag msg)
+        :baro-alt? (.isBarometricAltitude msg)}
+       add-gnd-spd))))
 
 
 (defn decode-hex

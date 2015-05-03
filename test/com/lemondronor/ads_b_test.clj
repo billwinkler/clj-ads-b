@@ -11,7 +11,7 @@
             :nic-supplement-b false,
             :surveillance-status 0,
             :alt 10972.800000000001,
-            :is-baro-alt true,
+            :baro-alt? true,
             :icao "c0ffee",
             :nic-supplement-a false,
             :cpr-lon 113957,
@@ -55,3 +55,32 @@
             :callsign "        "
             :category-description "No ADS-B Emitter Category Information"}
            (ads-b/decode-hex "903c1ff810820820820820000000")))))
+
+
+(deftest decode-emergency-or-priority-test
+  (testing "Emergency or Priority"
+    (is (= {:icao "3cbdce",
+            :downlink-format 17,
+            :capabilities 4,
+            :format-type-code 28
+            :subtype 1
+            :emergency-state-code 0
+            :emergency-state-text "no emergency"
+            :mode-a-code [7 0 7 3]}
+           (ads-b/decode-hex "8d3cbdcee1199400000000000000")))))
+
+
+(deftest decode-surface-position-test
+  (testing "Surface position"
+    (is (= {:horizontal-containment-radius-limit 25.0,
+            :capabilities 4,
+            :icao "3c432e",
+            :time-flag false,
+            :baro-alt? true,
+            :ground-speed-resolution 0.257222,
+            :nic-supplement 0,
+            :nic 10,
+            :format-type-code 6,
+            :ground-speed 4.372774,
+            :downlink-format 18}
+           (ads-b/decode-hex "903c432e31aad1686b3806000000")))))

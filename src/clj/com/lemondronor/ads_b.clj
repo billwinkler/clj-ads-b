@@ -54,7 +54,8 @@
                 :cpr-lon (.getCPREncodedLongitude msg)
                 :cpr-format (if (.isOddFormat msg) :odd :even)))]
       (->
-       {:icao (tools/toHexString (.getIcao24 msg))
+       {:type :airborne-position
+        :icao (tools/toHexString (.getIcao24 msg))
         :downlink-format (.getDownlinkFormat msg)
         :capabilities (.getCapabilities msg)
         :format-type-code (.getFormatTypeCode msg)
@@ -85,7 +86,8 @@
               (assoc-when (.hasGeoMinusBaroInfo msg)
                 d :geo-minus-baro (.getGeoMinusBaro msg)))]
       (->
-       {:icao (tools/toHexString (.getIcao24 msg))
+       {:type :airborne-velocity
+        :icao (tools/toHexString (.getIcao24 msg))
         :downlink-format (.getDownlinkFormat msg)
         :capabilities (.getCapabilities msg)
         :format-type-code (.getFormatTypeCode msg)
@@ -103,7 +105,8 @@
 (extend-type EmergencyOrPriorityStatusMsg
   IDictable
   (as-dict [msg]
-    {:icao (tools/toHexString (.getIcao24 msg))
+    {:type :extended-squitter-aircraft-status
+     :icao (tools/toHexString (.getIcao24 msg))
      :downlink-format (.getDownlinkFormat msg)
      :capabilities (.getCapabilities msg)
      :format-type-code (.getFormatTypeCode msg)
@@ -116,7 +119,8 @@
 (extend-type IdentificationMsg
   IDictable
   (as-dict [msg]
-    {:icao (tools/toHexString (.getIcao24 msg))
+    {:type :identification
+     :icao (tools/toHexString (.getIcao24 msg))
      :downlink-format (.getDownlinkFormat msg)
      :capabilities (.getCapabilities msg)
      :format-type-code (.getFormatTypeCode msg)
@@ -128,7 +132,8 @@
 (extend-type OperationalStatusMsg
   IDictable
   (as-dict [msg]
-    (-> {:icao (tools/toHexString (.getIcao24 msg))
+    (-> {:type :aircraft-operational-status
+         :icao (tools/toHexString (.getIcao24 msg))
          :downlink-format (.getDownlinkFormat msg)
          :capabilities (.getCapabilities msg)
          :format-type-code (.getFormatTypeCode msg)
@@ -179,7 +184,8 @@
                 :ground-speed (.getGroundSpeed msg)
                 :ground-speed-resolution (.getGroundSpeedResolution msg)))]
       (->
-       {:icao (tools/toHexString (.getIcao24 msg))
+       {:type :surface-position
+        :icao (tools/toHexString (.getIcao24 msg))
         :downlink-format (.getDownlinkFormat msg)
         :capabilities (.getCapabilities msg)
         :format-type-code (.getFormatTypeCode msg)
@@ -208,7 +214,8 @@
               (assoc-when (.hasGeoMinusBaroInfo msg)
                 d :geo-minus-baro (.getGeoMinusBaro msg)))]
       (->
-       {:icao (tools/toHexString (.getIcao24 msg))
+       {:type :airborne-velocity
+        :icao (tools/toHexString (.getIcao24 msg))
         :downlink-format (.getDownlinkFormat msg)
         :capabilities (.getCapabilities msg)
         :format-type-code (.getFormatTypeCode msg)

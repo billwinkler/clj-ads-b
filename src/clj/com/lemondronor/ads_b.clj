@@ -4,7 +4,7 @@
            (org.opensky.libadsb.exceptions MissingInformationException)
            (org.opensky.libadsb.msgs
             AirbornePositionMsg AirspeedHeadingMsg EmergencyOrPriorityStatusMsg
-            IdentificationMsg OperationalStatusMsg SurfacePositionMsg
+            IdentificationMsg ModeSReply OperationalStatusMsg SurfacePositionMsg
             VelocityOverGroundMsg)))
 
 (set! *warn-on-reflection* true)
@@ -37,6 +37,16 @@
   `(-> ~m
        ~@(for [[k v] (partition 2 args)]
            `(assoc-when-exists% ~k (fn [] ~v)))))
+
+
+(extend-type ModeSReply
+  IDictable
+  (as-dict [msg]
+    {:type :mode-s-reply
+     :icao (tools/toHexString (.getIcao24 msg))
+     :downlink-format (.getDownlinkFormat msg)
+     :capabilities (.getCapabilities msg)
+     :payload (vec (.getPayload msg))}))
 
 
 (extend-type AirbornePositionMsg

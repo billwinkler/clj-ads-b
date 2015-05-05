@@ -11,6 +11,60 @@
 (set! *warn-on-reflection* true)
 
 
+(defn read-hex-str [^String s]
+  (let [n (count s)
+        ^ints b (int-array (/ n 2))]
+    (doseq [i (range 0 n 2)]
+      (aset b
+            (/ i 2)
+            (int (+ (bit-shift-left (Character/digit (.charAt s i) 16) 4)
+                    (Character/digit (.charAt s (inc i)) 16)))))
+    b))
+
+
+(defn generic-decode-hex-str [hex-str]
+  (Decoder/genericDecoder hex-str))
+
+
+;; *02E99619FACDAE;
+;; *8D3C5EE69901BD9540078D37335F;
+;; *7700;
+
+;; @016CE3671C7423FFE7AB7BFCAB;
+;; @016CE3671AA8A800199A8BB80030A8000628F400;
+;; @016CE3671C747700;
+
+
+(defn has-beast-timestamp? [^String s]
+  (.startsWith s "@"))
+
+
+(defn parse-beast-timestamp [hex-str]
+  (let [^ints t (read-hex-str hex-str)
+        nanosec (bit-or (bit-shift-left (bit-and (aget t 2) 0x3f) 24)
+                        (bit-shift-left (aget t 3) 16)
+                        (bit-shift-left (aget t 4) 8)
+                        (aget t 5))
+        daysec (bit-or (bit-shift-left (aget t 0) 10)
+                       (bit-shift-left (aget t 1) 2)
+                       (bit-shift-right (aget t 2) 6))]
+    [daysec nanosec]))
+
+
+(defn parse-beast-str [^String s]
+  (let [end (dec (count s))
+        m (if (has-beast-timestamp? s)
+            {:timestamp (parse-beast-timestamp (subs s 1 13))
+             :payload (subs s 13 end)}
+            {:payload (subs s 1 end)})]
+    (assoc
+     m
+     :type (cond
+             (= (count (:payload m)) 4) :mode-ac
+             (= (count (:payload m)) 14) :mode-s-short
+             (= (count (:payload m)) 28) :mode-s-long))))
+
+
 (defmacro assoc-when
   "If test is true, assocs key/values onto m, otherwise returns m."
   [test m & args]
@@ -247,30 +301,6 @@
       (Decoder/genericDecoder)
       as-map))
 
-
-
-(defn read-hex-str [^String s]
-  (let [n (count s)
-        ^ints b (int-array (/ n 2))]
-    (doseq [i (range 0 n 2)]
-      (println i)
-      (aset b
-            (/ i 2)
-            (int (+ (bit-shift-left (Character/digit (.charAt s i) 16) 4)
-                    (Character/digit (.charAt s (inc i)) 16)))))
-    b))
-
-
-(defn parse-mode-s-beast-timestamp [hex-str]
-  (let [^ints t (read-hex-str hex-str)
-        nanosec (bit-or (bit-shift-left (bit-and (aget t 2) 0x3f) 24)
-                        (bit-shift-left (aget t 3) 16)
-                        (bit-shift-left (aget t 4) 8)
-                        (aget t 5))
-        daysec (bit-or (bit-shift-left (aget t 0) 10)
-                       (bit-shift-left (aget t 1) 2)
-                       (bit-shift-right (aget t 2) 6))]
-    [daysec nanosec]))
 
 
 (defn cpr-mod-function [a b]

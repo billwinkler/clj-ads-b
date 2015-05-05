@@ -4,6 +4,32 @@
             [com.lemondronor.ads-b :as ads-b]))
 
 
+(deftest beast-parsing
+  (testing "Mode A/C"
+    (is (= {:type :mode-ac, :payload "7700"}
+           (ads-b/parse-beast-str "*7700;"))))
+  (testing "Mode S short"
+    (is (= {:type :mode-s-short, :payload "02E99619FACDAE"}
+           (ads-b/parse-beast-str "*02E99619FACDAE;"))))
+  (testing "Mode S long"
+    (is (= {:type :mode-s-long, :payload "8D3C5EE69901BD9540078D37335F"}
+           (ads-b/parse-beast-str "*8D3C5EE69901BD9540078D37335F;"))))
+  (testing "Mode A/C with timestamp"
+    (is (= {:type :mode-ac, :timestamp [1459 593960052], :payload "7700"}
+           (ads-b/parse-beast-str "@016CE3671C747700;"))))
+  (testing "Mode S short with timestamp"
+    (is (= {:type :mode-s-short,
+            :timestamp [1459 593960052],
+            :payload "23FFE7AB7BFCAB"}
+           (ads-b/parse-beast-str "@016CE3671C7423FFE7AB7BFCAB;"))))
+  (testing "Mode S long with timestamp"
+    (is (= {:type :mode-s-long,
+            :timestamp [1459 593959592],
+            :payload "A800199A8BB80030A8000628F400"}
+           (ads-b/parse-beast-str
+            "@016CE3671AA8A800199A8BB80030A8000628F400;")))))
+
+
 (deftest decode-airborne-position-test
   (testing "Decoding airborne position"
     (is (= {:type :airborne-position

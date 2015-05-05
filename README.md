@@ -6,6 +6,16 @@ parses Mode S/ADS-B transponder messages. (See also:
 [dump1090](https://github.com/MalcolmRobb/dump1090),
 [gr-air-modes](https://github.com/bistromath/gr-air-modes), etc.)
 
+## Caveats
+
+java-libadsb only decodes a few types of Mode S messages, and no Mode
+A/C messages.
+
+Civil aviation uses Mode S messages with types DF0, DF4, DF5, DF11,
+DF16, DF17, DF18, DF20, DF21 and DF24; java-libadsb only decodes some
+subtypes of DF17 and DF18.
+
+
 ## Usage
 
 ```

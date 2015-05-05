@@ -7,5 +7,6 @@
   :source-paths ["src/clj"]
   :java-source-paths ["src/java"]
   :dependencies [[org.apache.avro/avro "1.7.6"]
-                 [org.clojure/clojure "1.6.0"]]
+                 [org.clojure/clojure "1.6.0"]
+                 [org.clojure/math.numeric-tower "0.0.4"]]
   :profiles {:dev {:source-paths ["examples"]}})

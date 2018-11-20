@@ -1,4 +1,4 @@
-(defproject com.lemondronor/ads-b "0.1.2-SNAPSHOT"
+(defproject com.lemondronor/ads-b "0.1.2"
   :description "Clojure code for parsing ADS-B transponder messages."
   :url "https://github.com/wiseman/clj-ads-b"
   :license {:name "GNU General Public License Version 3"

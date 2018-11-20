@@ -8,5 +8,6 @@
   :java-source-paths ["src/java"]
   :dependencies [[org.apache.avro/avro "1.7.6"]
                  [org.clojure/clojure "1.9.0"]
-                 [org.clojure/math.numeric-tower "0.0.4"]]
+                 [org.clojure/math.numeric-tower "0.0.4"]
+                 [org.opensky-network/libadsb "3.0.0"]]
   :profiles {:dev {:source-paths ["examples"]}})

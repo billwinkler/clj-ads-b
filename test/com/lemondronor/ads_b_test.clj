@@ -3,6 +3,12 @@
             [clojure.test :refer :all]
             [com.lemondronor.ads-b :as ads-b]))
 
+(defn approx=
+  ([a b]
+   (approx= a b 0.000001))
+  ([a b eps]
+   (< (Math/abs (- a b)) eps)))
+
 
 (deftest beast-parsing
   (testing "Mode A/C"
@@ -49,7 +55,7 @@
             :format-type-code 11,
             :cpr-format :odd,
             :downlink-format 17}
-         (ads-b/decode-hex "8dc0ffee58b986d0b3bd25000000")))))
+           (ads-b/decode-hex "8dc0ffee58b986d0b3bd25000000")))))
 
 
 (deftest decode-emergency-or-priority-test
@@ -125,20 +131,37 @@
 
 (deftest decode-velocity-over-ground-test
   (testing "Decoding velocity over ground"
-    (is (= {:type :airborne-velocity
-            :capabilities 0,
-            :e-w-spd -195.48872,
-            :n-s-spd -104.94657600000001,
-            :vertical-spd 0.0,
-            :icao "48cb15",
-            :supersonic? false,
-            :nac 2,
-            :ifr? false,
-            :geo-minus-baro -182.88,
-            :format-type-code 19,
-            :ground-speed 221.87749651860187,
-            :change-intent? false,
-            :barometric-vertical-spd? false,
-            :downlink-format 17,
-            :heading 61.77122381863042}
-           (ads-b/decode-hex "8d48cb1599117d19a00499000000")))))
+    (let [r (ads-b/decode-hex "8d48cb1599117d19a00499000000")]
+      (is (= #{:type
+               :capabilities
+               :e-w-spd
+               :n-s-spd
+               :vertical-spd
+               :icao
+               :supersonic?
+               :nac
+               :ifr?
+               :geo-minus-baro
+               :format-type-code
+               :ground-speed
+               :change-intent?
+               :barometric-vertical-spd?
+               :downlink-format
+               :heading}
+             (set (keys r))))
+      (is (= :airborne-velocity (:type r)))
+      (is (= 0 (:capabilities r)))
+      (is (approx= -195.48872 (:e-w-spd r)))
+      (is (approx= -104.94657600000001 (:n-s-spd r)))
+      (is (approx= 0.0 (:vertical-spd r)))
+      (is (= "48cb15" (:icao r)))
+      (is (not (:supersonic? r)))
+      (is (= 2 (:nac r)))
+      (is (not (:ifr? r)))
+      (is (approx= -182.88 (:geo-minus-baro r)))
+      (is (= 19 (:format-type-code r)))
+      (is (approx= 221.87749651860187 (:ground-speed r)))
+      (is (not (:change-intent? r)))
+      (is (not (:barometric-vertical-spd? r)))
+      (is (= 17 (:downlink-format r)))
+      (is (approx= 61.77122381863042 (:heading r))))))

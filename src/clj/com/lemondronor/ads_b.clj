@@ -2,10 +2,11 @@
   "Decodes Mode-S messages. Thin wrapper around java-libadsb."
   (:require [clojure.math.numeric-tower :as math])
   (:import (org.opensky.libadsb Decoder tools)
-           (org.opensky.libadsb.exceptions MissingInformationException)
+;;           (org.opensky.libadsb.exceptions MissingInformationException)
+           (org.opensky.libadsb.exceptions UnspecifiedFormatError)
            (org.opensky.libadsb.msgs
-            AirbornePositionMsg AirspeedHeadingMsg EmergencyOrPriorityStatusMsg
-            IdentificationMsg ModeSReply OperationalStatusMsg SurfacePositionMsg
+            AirbornePositionV0Msg AirspeedHeadingMsg EmergencyOrPriorityStatusMsg
+            IdentificationMsg ModeSReply OperationalStatusV0Msg SurfacePositionV0Msg
             VelocityOverGroundMsg)))
 
 (set! *warn-on-reflection* true)
@@ -76,7 +77,7 @@
   [m k v-fn]
   (try
     (assoc m k (v-fn))
-    (catch MissingInformationException e
+    (catch UnspecifiedFormatError e
       m)))
 
 
@@ -100,11 +101,11 @@
     {:type :mode-s-reply
      :icao (tools/toHexString (.getIcao24 msg))
      :downlink-format (.getDownlinkFormat msg)
-     :capabilities (.getCapabilities msg)
+;;     :capabilities (.getCapabilities msg)
      :payload (vec (.getPayload msg))}))
 
 
-(extend-type AirbornePositionMsg
+(extend-type AirbornePositionV0Msg
   IConvertableToMap
   (as-map [msg]
     (letfn [(add-alt [d]
@@ -159,7 +160,7 @@
         :supersonic? (.isSupersonic msg)
         :change-intent? (.hasChangeIntent msg)
         :ifr? (.hasIFRCapability msg)
-        :nac (.getNavigationAccuracyCategory msg)
+;;        :nac (.getNavigationAccuracyCategory msg)
         :barometric-vertical-spd? (.isBarometricVerticalSpeed msg)}
        add-hdg
        add-spd
@@ -194,7 +195,7 @@
      :callsign (String. (.getIdentity msg))}))
 
 
-(extend-type OperationalStatusMsg
+(extend-type OperationalStatusV0Msg
   IConvertableToMap
   (as-map [msg]
     (-> {:type :aircraft-operational-status
@@ -231,7 +232,7 @@
                                      :true-north)))))
 
 
-(extend-type SurfacePositionMsg
+(extend-type SurfacePositionV0Msg
   IConvertableToMap
   (as-map [msg]
     (letfn [(add-pos [d]

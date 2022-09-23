@@ -6,8 +6,13 @@
   :deploy-repositories [["releases" :clojars]]
   :source-paths ["src/clj"]
   :java-source-paths ["src/java"]
+  :main readraw
+;;  :aot [examples.readraw]
+  :uberjar-name "readraw.jar"
   :dependencies [[org.apache.avro/avro "1.11.1"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/math.numeric-tower "0.0.5"]
                  [org.opensky-network/libadsb "3.4.0"]]
-  :profiles {:dev {:source-paths ["examples"]}})
+  :profiles {:dev {:source-paths ["examples"]}
+             :uberjar {:aot :all
+                       :source-paths ["examples"]}})

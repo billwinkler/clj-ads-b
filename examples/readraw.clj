@@ -1,6 +1,7 @@
 (ns readraw
   ""
-  (:require [com.lemondronor.ads-b :as ads-b]))
+  (:require [com.lemondronor.ads-b :as ads-b])
+  (:gen-class))
 
 (set! *warn-on-reflection* true)
 

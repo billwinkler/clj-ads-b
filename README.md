@@ -58,7 +58,7 @@ There are 6 types of message:
 :surface-position
 ```
 
-Run the examples from target directory (dump1090 executable in peer directory)
+Run examples/readraw from target directory (dump1090 executable in peer directory)
 
 ``` shell
 ../../dump1090/dump1090 --raw | java -jar readraw.jar

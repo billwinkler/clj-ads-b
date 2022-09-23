@@ -19,7 +19,7 @@ subtypes of DF17 and DF18.
 ## Usage
 
 ```
-[com.lemondronor/ads-b "0.0.1"]
+[com.lemondronor/ads-b "0.1.4"]
 ```
 
 ```
@@ -56,6 +56,12 @@ There are 6 types of message:
 :identification
 :operational-aircraft-status
 :surface-position
+```
+
+Run the examples from target directory (dump1090 executable in peer directory)
+
+``` shell
+../../dump1090/dump1090 --raw | java -jar readraw.jar
 ```
 
 ## License

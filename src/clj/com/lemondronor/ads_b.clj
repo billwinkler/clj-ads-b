@@ -5,8 +5,8 @@
 ;;           (org.opensky.libadsb.exceptions MissingInformationException)
            (org.opensky.libadsb.exceptions UnspecifiedFormatError)
            (org.opensky.libadsb.msgs
-            AirbornePositionV0Msg AirspeedHeadingMsg EmergencyOrPriorityStatusMsg
-            IdentificationMsg ModeSReply OperationalStatusV0Msg SurfacePositionV0Msg
+            AirbornePositionV2Msg AirspeedHeadingMsg EmergencyOrPriorityStatusMsg
+            IdentificationMsg ModeSReply OperationalStatusV0Msg SurfacePositionV2Msg
             VelocityOverGroundMsg)))
 
 (set! *warn-on-reflection* true)
@@ -25,15 +25,6 @@
 
 (defn generic-decode-hex-str [hex-str]
   (Decoder/genericDecoder hex-str))
-
-
-;; *02E99619FACDAE;
-;; *8D3C5EE69901BD9540078D37335F;
-;; *7700;
-
-;; @016CE3671C7423FFE7AB7BFCAB;
-;; @016CE3671AA8A800199A8BB80030A8000628F400;
-;; @016CE3671C747700;
 
 
 (defn has-beast-timestamp? [^String s]
@@ -105,7 +96,7 @@
      :payload (vec (.getPayload msg))}))
 
 
-(extend-type AirbornePositionV0Msg
+(extend-type AirbornePositionV2Msg
   IConvertableToMap
   (as-map [msg]
     (letfn [(add-alt [d]
@@ -232,7 +223,7 @@
                                      :true-north)))))
 
 
-(extend-type SurfacePositionV0Msg
+(extend-type SurfacePositionV2Msg
   IConvertableToMap
   (as-map [msg]
     (letfn [(add-pos [d]
@@ -288,7 +279,7 @@
         :supersonic? (.isSupersonic msg)
         :change-intent? (.hasChangeIntent msg)
         :ifr? (.hasIFRCapability msg)
-        :nac (.getNavigationAccuracyCategory msg)
+        :nac (.getNACv msg)
         :barometric-vertical-spd? (.isBarometricVerticalSpeed msg)}
        add-vel
        add-vert-spd
